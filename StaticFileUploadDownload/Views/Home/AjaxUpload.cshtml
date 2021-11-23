@@ -1,0 +1,79 @@
+﻿
+@{
+    ViewData["Title"] = "AjaxUpload";
+}
+@section Style
+{
+    <style>
+        .upload-button {
+            background: #f0f0f0;
+            border-radius: 100px;
+            text-align: center;
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .upload-button .label {
+            line-height: 200px;
+            pointer-events: none;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 200px;
+            height: 200px;
+        }
+
+        .upload-button input {
+            opacity: 0;
+            cursor: pointer;
+            font-size: 200px;
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+}
+
+<h1>AjaxUpload</h1>
+<p>此頁面展示如何用Ajax上傳與下載檔案於 wwwroot 之外的資料夾</p>
+
+<label>檔案上傳</label>
+<form asp-action="AjaxUpload" method="post" id="form" name="form" enctype="multipart/form-data"><!--action="/Home/AjaxUpload"-->
+    <div class="upload-button">
+        <div class="label">Click me!</div>
+        <input id="files" name="files" type="file" size="1" multiple />
+    </div>
+    <div class="form-group">
+        <span>@TempData["msg"]</span>
+    </div>
+</form>
+
+@section Scripts
+{
+    <script>
+        $("#files").on("change", function () {
+            //直接上傳檔案，後端可以自己寫
+            //$('#form').submit();
+
+            //用 ajax 上傳檔案
+            var input = $(this);
+            var files = input.files;
+            var formData = new FormData();
+
+            for (var file in files) {
+                formData.append("files", file, file.name);
+            }
+
+            $.ajax({
+                url: "/Home/AjaxUpload",
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: "POST",
+                success: function (data) {
+                    alert("Files Uploaded!");
+                }
+            });
+        });
+    </script>
+}

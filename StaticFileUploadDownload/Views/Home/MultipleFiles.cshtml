@@ -1,0 +1,79 @@
+﻿
+@{
+    ViewData["Title"] = "多筆上傳";
+}
+
+<h1>MultipleFiles</h1>
+<p>此頁面展示如何上傳多筆檔案</p>
+<p>由於不涉及資料庫，VMFiles 直接置於 Models</p>
+<p>安全性實作「<a href="https://docs.microsoft.com/zh-tw/aspnet/core/mvc/models/file-uploads?view=aspnetcore-5.0#match-name-attribute-value-to-parameter-name-of-post-method">將名稱屬性值與 POST 方法的參數名稱相符</a>」</p>
+
+<label>檔案上傳(未實作安全性)</label>
+<form asp-action="MultipleFiles" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <input type="file" name="fileList" multiple>
+    </div>
+    <div class="form-group">
+        <input type="submit" class="btn btn-primary" value="上傳檔案" />
+    </div>
+    <div class="form-group">
+        <span>@TempData["msg"]</span>
+    </div>
+</form>
+<!--
+由於原本的美化方式只會顯示第一個檔案名稱，這裡先拿掉
+-->
+<br />
+<br />
+<p>前述安全性實作的部分可能是指涉用 ajax post 方法</p>
+<label>檔案上傳</label>
+<!--<form id="SetDataForm" asp-antiforgery="true">-->
+<form id="MultipleFilesWithSecurity" method="post" enctype="multipart/form-data" asp-antiforgery="true">
+    <div class="mb-3">
+        <input type="file" name="fileList" id="fileList" multiple>
+    </div>
+    <div class="form-group">
+        <!--<input type="submit" class="btn btn-primary" value="上傳檔案" />-->
+        <input id="Send" type="button" value="上傳檔案" class="btn btn-primary" />
+    </div>
+    <div class="form-group">
+        <span id="UploadMessage">@TempData["msg"]</span>
+    </div>
+</form>
+
+@section Scripts 
+{
+    <script>
+        $('#Send').click(function () {
+            var fd = new FormData();
+            var fileList = $('#fileList')[0].files[0];
+            fd.append('fileList', fileList);
+            $.ajax({
+                url: '/Home/MultipleFilesWithSecurity/',
+                type: 'POST',
+                data: fd,
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (result, status) {
+                    if (result.success) {
+                        location.reload(true);
+                    }
+                    else {
+                        alert(result.data);
+                    }
+                },
+                error: function (result, status) {
+                    alert("Ajax Failed :" + result.status + "," + status);
+                }
+            });
+        });
+
+        /*var formData = new FormData();
+
+        for (var file in files) {
+            console.log("收到");
+            formData.append("fileList", file, file.name);
+        }*/
+    </script>
+}

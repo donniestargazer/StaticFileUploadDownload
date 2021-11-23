@@ -1,0 +1,68 @@
+﻿@model IEnumerable<StaticFileUploadDownload.Models.VMFiles>
+
+@{
+    ViewData["Title"] = "wwwrootFolder";
+}
+
+<h1>wwwrootFolder</h1>
+<p>此頁面展示如何上傳與下載檔案於 wwwroot 的資料夾</p>
+<p>由於不涉及資料庫，VMFiles 直接置於 Models</p>
+
+<label>檔案上傳</label>
+<form asp-action="wwwrootFolder" method="post" enctype="multipart/form-data">
+    <div class="custom-file mb-3">
+        <input type="file" class="custom-file-input" id="customFile" name="file">
+        <label class="custom-file-label" for="customFile">Choose file</label>
+    </div>
+    <div class="form-group">
+        <input type="submit" class="btn btn-primary" value="上傳檔案" />
+    </div>
+    <div class="form-group">
+        <span>@TempData["msg"]</span>
+    </div>
+</form>
+<!--
+這是 5 版的作法，Custom file input 被拿掉
+<input type="file" class="form-control">
+-->
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="w-10">&nbsp;</th>
+            <th>檔案名稱</th>
+            <th>檔案類型</th>
+            <th>建立日期</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a class="btn btn-success" href="@item.Path">下載</a>
+                </td>
+                <td class="align-middle">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td class="align-middle">
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td class="align-middle">
+                    @Html.DisplayFor(modelItem => item.UploadDate)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts
+{
+    <script>
+        //這是配合檔案上傳後改變 label 名稱用的，4 版不知為何沒加入，5 版 Custom file input 被拿掉
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+}

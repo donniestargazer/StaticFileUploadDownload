@@ -1,0 +1,38 @@
+﻿@model IEnumerable<StaticFileUploadDownload.Models.VMFiles>
+
+@{
+    ViewData["Title"] = "重新命名下載";
+}
+
+<h1>重新命名下載</h1>
+
+<p></p>
+<table class="table">
+    <thead>
+        <tr>
+            <th class="w-10">&nbsp;</th>
+            <th>檔案名稱</th>
+            <th>檔案類型</th>
+            <th>建立日期</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a class="btn btn-success" href="@item.Path">下載</a>
+                </td>
+                <td class="align-middle">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td class="align-middle">
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td class="align-middle">
+                    @Html.DisplayFor(modelItem => item.UploadDate)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

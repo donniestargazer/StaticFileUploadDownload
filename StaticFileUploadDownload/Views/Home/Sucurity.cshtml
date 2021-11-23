@@ -1,0 +1,200 @@
+﻿@{
+    ViewData["Title"] = "安全性";
+}
+
+<h1>安全性</h1>
+<p>此頁面展示如何在 <a asp-controller="Home" asp-action="DifferentFolder">DifferentFolder</a> 的基礎上實作安全性</p>
+<p>實作項目參考自：<a href="https://docs.microsoft.com/zh-tw/aspnet/core/mvc/models/file-uploads?view=aspnetcore-5.0">ASP.NET Core 中的 Upload 檔案</a></p>
+<p>安全性實作項目包括：</p>
+<ul>
+    <li>(20211025完成)只允許應用程式設計規格的核准副檔名。(使用 List string 去比對上傳的檔案的副檔名是否吻合應用程式的設計)</li>
+    <li>確認已在伺服器上執行用戶端檢查。用戶端檢查很容易規避。(看不出來寫這段要幹嘛？如果是伺服器端作檢查，可能是文章有列出的所有檢查方式)</li>
+    <li>使用相同名稱的已上傳檔案覆寫檔案時，請先檢查資料庫或實體儲存體的檔案名，再上傳檔案。(此處實作不開放使用相同檔案名稱)</li>
+</ul>
+<p>
+    <a href="https://www.uj5u.com/net/285368.html">文章</a>提到「檔案的簽名由檔案開頭部分中的前幾個位元組確定」，<a href="https://dotnetthoughts.net/file-upload-extension-validation-in-aspnet-core/">這篇文章</a>提到「myrmec」Nuget套件可以比對標頭檔(File Header)，但是太久沒更新，嘗試用另一個<a href="https://github.com/neilharvey/FileSignatures">FileSignatures</a>
+</p>
+<p>目前尚未實作：</p>
+<p>「<a href="https://docs.microsoft.com/zh-tw/aspnet/core/mvc/models/file-uploads?view=aspnetcore-5.0#match-name-attribute-value-to-parameter-name-of-post-method">將名稱屬性值與 POST 方法的參數名稱相符</a>」一節應該是針對多筆上傳</p>
+<p>「伺服器和應用程式設定」的章節內容著重在限制檔案上傳大小，由於已經實作限制檔案上傳大小所以不重複施作</p>
+<p>「在儲存檔案之前，在上傳的內容上執行病毒/惡意程式碼掃描器。」可能是指<a href="https://docs.microsoft.com/zh-tw/windows/win32/amsi/how-amsi-helps">AMSI</a>，但是網路上的教學很少。</p>
+
+@*<label>檔案上傳&nbsp;(限定：.docx、.pptx、xlsx、.doc、.ppt、xls)</label>*@
+<label>檔案上傳&nbsp;(限定：.docx、.pptx、xlsx)</label>
+<form asp-action="Sucurity" method="post" enctype="multipart/form-data">
+    <div class="custom-file mb-3">
+        <input type="file" class="custom-file-input" id="customFile" name="file">
+        <label class="custom-file-label" for="customFile">Choose file</label>
+    </div>
+    <div class="form-group">
+        <input type="submit" class="btn btn-primary" value="上傳檔案" />
+    </div>
+    <div class="form-group">
+        <span>@TempData["msg"]</span>
+    </div>
+</form>
+<!--
+這是 5 版的作法，Custom file input 被拿掉
+<input type="file" class="form-control">
+-->
+
+<p>FileSignatures 的 FileSignatures.Formats 底下對應的 Class</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>類型名稱</th>
+            <th>對應的 Class</th>
+            <th>副檔名</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Bitmap</td>
+            <td>Bmp、Image</td>
+            <td>.bmp</td>
+        </tr>
+        <tr>
+            <td>Excel</td>
+            <td>Excel、OfficeOpenXml</td>
+            <td>.xlsx</td>
+        </tr>
+        <tr>
+            <td>Excel 97-2003</td>
+            <td>ExcelLegacy、</td>
+            <td>.xls</td>
+        </tr>
+        <tr>
+            <td>Windows Executable</td>
+            <td>Executable、</td>
+            <td>.exe</td>
+        </tr>
+        <tr>
+            <td>GIF</td>
+            <td>Gif、Image</td>
+            <td>.gif</td>
+        </tr>
+        <tr>
+            <td>JPEG</td>
+            <td>Jpeg、Image</td>
+            <td>.jpeg</td>
+        </tr>
+        <tr>
+            <td>Open Document Presentation</td>
+            <td>OpenDocumentPresentation</td>
+            <td>.odp</td>
+        </tr>
+        <tr>
+            <td>Open Document Spreadhseet</td>
+            <td>OpenDocumentSpreadsheet</td>
+            <td>.ods</td>
+        </tr>
+        <tr>
+            <td>Open Document Text</td>
+            <td>OpenDocumentText</td>
+            <td>.odt</td>
+        </tr>
+        <tr>
+            <td>Outlook Message</td>
+            <td>OutlookMessage</td>
+            <td>.msg</td>
+        </tr>
+        <tr>
+            <td>PDF</td>
+            <td>Pdf</td>
+            <td>.pdf</td>
+        </tr>
+        <tr>
+            <td>PNG</td>
+            <td>Png、Image</td>
+            <td>.png</td>
+        </tr>
+        <tr>
+            <td>PowerPoint</td>
+            <td>Powerpoint、OfficeOpenXml</td>
+            <td>.pptx</td>
+        </tr>
+        <tr>
+            <td>Powerpoint 97-2003</td>
+            <td>PowerpointLegacy</td>
+            <td>.ppt</td>
+        </tr>
+        <tr>
+            <td>Rich Text Format</td>
+            <td>RichTextFormat</td>
+            <td>.rtf</td>
+        </tr>
+        <tr>
+            <td>TIFF</td>
+            <td>Tiff、Image</td>
+            <td>.tif</td>
+        </tr>
+        <tr>
+            <td>Visio</td>
+            <td>Visio</td>
+            <td>.vsdx</td>
+        </tr>
+        <tr>
+            <td>Visio 97-2003</td>
+            <td>VisioLegacy</td>
+            <td>.vsd</td>
+        </tr>
+        <tr>
+            <td>Word</td>
+            <td>Word、OfficeOpenXml</td>
+            <td>.docx</td>
+        </tr>
+        <tr>
+            <td>Word 97-2003</td>
+            <td>WordLegacy</td>
+            <td>.doc</td>
+        </tr>
+        <tr>
+            <td>Xps</td>
+            <td>Xps</td>
+            <td>.xps</td>
+        </tr>
+        <tr>
+            <td>Zip</td>
+            <td>Zip</td>
+            <td>.zip</td>
+        </tr>
+        <tr>
+            <td>Composite Document File V2 Document</td>
+            <td>CompoundFileBinary </td>
+            <td>.cdf(?)</td>
+        </tr>
+        <tr>
+            <td>DICOM</td>
+            <td>CompoundFileBinary</td>
+            <td>.DCM</td>
+        </tr>
+        <tr>
+            <td>JFIF</td>
+            <td>JFIF、Jpeg(?)、Image(?)</td>
+            <td>.jfif</td>
+        </tr>
+        <tr>
+            <td>JpegExif(?)</td>
+            <td>JpegExif、Jpeg(?)、Image(?)</td>
+            <td>.jpeg(?)</td>
+        </tr>
+        <tr>
+            <td>SPIFF</td>
+            <td>Spiff、Jpeg(?)、Image(?)</td>
+            <td>.spiff</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+@section Scripts
+{
+    <script>
+        //這是配合檔案上傳後改變 label 名稱用的，4 版不知為何沒加入，5 版 Custom file input 被拿掉
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+}
