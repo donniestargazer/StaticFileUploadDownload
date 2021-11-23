@@ -9,13 +9,13 @@
 <ul>
     <li>(20211025完成)只允許應用程式設計規格的核准副檔名。(使用 List string 去比對上傳的檔案的副檔名是否吻合應用程式的設計)</li>
     <li>確認已在伺服器上執行用戶端檢查。用戶端檢查很容易規避。(看不出來寫這段要幹嘛？如果是伺服器端作檢查，可能是文章有列出的所有檢查方式)</li>
-    <li>使用相同名稱的已上傳檔案覆寫檔案時，請先檢查資料庫或實體儲存體的檔案名，再上傳檔案。(此處實作不開放使用相同檔案名稱)</li>
+    <li>使用相同名稱的已上傳檔案覆寫檔案時，請先檢查資料庫或實體儲存體的檔案名，再上傳檔案。(此處開放使用相同檔案名稱)</li>
 </ul>
 <p>
     <a href="https://www.uj5u.com/net/285368.html">文章</a>提到「檔案的簽名由檔案開頭部分中的前幾個位元組確定」，<a href="https://dotnetthoughts.net/file-upload-extension-validation-in-aspnet-core/">這篇文章</a>提到「myrmec」Nuget套件可以比對標頭檔(File Header)，但是太久沒更新，嘗試用另一個<a href="https://github.com/neilharvey/FileSignatures">FileSignatures</a>
 </p>
 <p>目前尚未實作：</p>
-<p>「<a href="https://docs.microsoft.com/zh-tw/aspnet/core/mvc/models/file-uploads?view=aspnetcore-5.0#match-name-attribute-value-to-parameter-name-of-post-method">將名稱屬性值與 POST 方法的參數名稱相符</a>」一節應該是針對多筆上傳</p>
+<p>「<a href="https://docs.microsoft.com/zh-tw/aspnet/core/mvc/models/file-uploads?view=aspnetcore-5.0#match-name-attribute-value-to-parameter-name-of-post-method">將名稱屬性值與 POST 方法的參數名稱相符</a>」一節應該是針對Ajax上傳</p>
 <p>「伺服器和應用程式設定」的章節內容著重在限制檔案上傳大小，由於已經實作限制檔案上傳大小所以不重複施作</p>
 <p>「在儲存檔案之前，在上傳的內容上執行病毒/惡意程式碼掃描器。」可能是指<a href="https://docs.microsoft.com/zh-tw/windows/win32/amsi/how-amsi-helps">AMSI</a>，但是網路上的教學很少。</p>
 
