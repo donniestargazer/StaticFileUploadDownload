@@ -287,32 +287,6 @@ namespace StaticFileUploadDownload.Controllers
             return View();
         }
 
-        public IActionResult AjaxUpload()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AjaxUpload(IList<IFormFile> files)
-        {
-            foreach (var file in files)
-            {
-                var inspector = new FileFormatInspector();
-                var mediaType = inspector.DetermineFileFormat(file.OpenReadStream());
-                var extension = inspector.DetermineFileFormat(file.OpenReadStream()).Extension;
-                Debug.WriteLine("副檔名：" + extension + "，網際網路媒體型式：" + mediaType);
-            }
-            return this.View();
-        }
-
-        private string EnsureCorrectFilename(string filename)
-        {
-            if (filename.Contains("\\"))
-                filename = filename.Substring(filename.LastIndexOf("\\") + 1);
-
-            return filename;
-        }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -327,11 +301,21 @@ namespace StaticFileUploadDownload.Controllers
                     var mediaType = inspector.DetermineFileFormat(file.OpenReadStream());
                     var extension = inspector.DetermineFileFormat(file.OpenReadStream()).Extension;
                     Debug.WriteLine("副檔名：" + extension + "，網際網路媒體型式：" + mediaType);
-                    if (file.Length > 0)//取得檔案的長度（以位元組為單位）
+                    Debug.WriteLine(mediaType is OfficeOpenXml);
+                    Debug.WriteLine(file.Length > 0);
+                    Debug.WriteLine(file.Length < _fileSizeLimit);
+
+                    //比對副檔名(這是沒有辦法載入其他套件的最佳作法)
+                    //if (file.Length > 0 && DataTypeWhiteList.Contains(DataType))
+                    //取得檔案的長度（以位元組為單位）
+                    //大於 0 且小於指定長度(數值寫於 appsettings)
+                    //比對網際網路媒體型式是否符合 openxmlformats(目前有 .docx、.pptx、xlsx)
+                    if (file.Length > 0 && file.Length < _fileSizeLimit && mediaType is OfficeOpenXml)
                     {
+                        Debug.WriteLine("副檔名：" + extension + "，網際網路媒體型式：" + mediaType);
                         //Guid.NewGuid() 產生亂碼檔名
                         //Path.GetExtension(file.FileName) 取得副檔名
-                        string filename = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                        string filename = Guid.NewGuid() + "." + extension;
 
 
                         //Directory.GetCurrentDirectory() 取得實體路徑 D:\電腦備份\電腦備份文件\程式設計\Visual Studio IDE\C#\StaticFileUploadDownload\StaticFileUploadDownload
@@ -355,7 +339,36 @@ namespace StaticFileUploadDownload.Controllers
             {
                 throw;
             }
+            return RedirectToAction("MultipleFiles");
+        }
+
+        public IActionResult AjaxUpload()
+        {
             return View();
+        }
+
+        //Ajax 上傳預期為配合 API，此處不予實作
+        [HttpPost]
+        public async Task<IActionResult> AjaxUpload(List<IFormFile> files)
+        {
+            foreach (var file in files)
+            {
+                Debug.WriteLine("file");
+                var inspector = new FileFormatInspector();
+                var mediaType = inspector.DetermineFileFormat(file.OpenReadStream());
+                var extension = inspector.DetermineFileFormat(file.OpenReadStream()).Extension;
+                Debug.WriteLine("副檔名：" + extension + "，網際網路媒體型式：" + mediaType);
+            }
+            return this.View();
+        }
+
+        //Ajax 上傳預期為配合 API，此處不予實作
+        private string EnsureCorrectFilename(string filename)
+        {
+            if (filename.Contains("\\"))
+                filename = filename.Substring(filename.LastIndexOf("\\") + 1);
+
+            return filename;
         }
 
         public IActionResult DownloadRename()
