@@ -373,20 +373,36 @@ namespace StaticFileUploadDownload.Controllers
 
         public IActionResult DownloadRename()
         {
-            List<VMFiles> fileList =
-                new List<VMFiles>() {
-                    new VMFiles() { Name = "ACEU 最佳移動教學.docx" , Path = "/app-download/115d43f2-18b9-4828-958a-f997857fa8e9.docx" , Type = ".docx" , UploadDate = DateTime.Parse("2021/10/23 下午 07:28:45") } ,
-                    new VMFiles() { Name = "What is cyberpunk(什麼是電馭叛客).docx" , Path = "/app-download/4a74dd35-6cdd-4a41-9f1a-1680d2457f53.docx" , Type = ".docx" , UploadDate = DateTime.Parse("2021/10/23 下午 07:45:18") } ,
-                    new VMFiles() { Name = "如何將粉絲群一分為二 (重寫最後生還者2).docx" , Path = "/app-download/6e6cbe76-11e0-4c30-9f5e-46342721ad99.docx" , Type = ".docx" , UploadDate = DateTime.Parse("2021/10/23 下午 07:50:56") }
+            List<VMDwonloadFiles> fileList =
+                new List<VMDwonloadFiles>() {
+                    new VMDwonloadFiles() { idx=1, OriginalName = "ACEU 最佳移動教學.docx" , StoredUpName = "115d43f2-18b9-4828-958a-f997857fa8e9.docx" , Type = ".docx" , UploadDate = DateTime.Parse("2021/10/23 下午 07:28:45") } ,
+                    new VMDwonloadFiles() { idx=2, OriginalName = "What is cyberpunk(什麼是電馭叛客).docx" , StoredUpName = "4a74dd35-6cdd-4a41-9f1a-1680d2457f53.docx" , Type = ".docx" , UploadDate = DateTime.Parse("2021/10/23 下午 07:45:18") } ,
+                    new VMDwonloadFiles() { idx=3, OriginalName = "如何將粉絲群一分為二 (重寫最後生還者2).docx" , StoredUpName = "6e6cbe76-11e0-4c30-9f5e-46342721ad99.docx" , Type = ".docx" , UploadDate = DateTime.Parse("2021/10/23 下午 07:50:56") }
                 };
             return View(fileList);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DownloadRename(IFormFile file)
+        public async Task<IActionResult> DownloadRename(IFormCollection iFormcollection)
         {
-            return View();
+            List<VMDwonloadFiles> fileList =
+                new List<VMDwonloadFiles>() {
+                    new VMDwonloadFiles() { idx=1, OriginalName = "ACEU 最佳移動教學.docx" , StoredUpName = "115d43f2-18b9-4828-958a-f997857fa8e9.docx" , Type = ".docx" , UploadDate = DateTime.Parse("2021/10/23 下午 07:28:45") } ,
+                    new VMDwonloadFiles() { idx=2, OriginalName = "What is cyberpunk(什麼是電馭叛客).docx" , StoredUpName = "4a74dd35-6cdd-4a41-9f1a-1680d2457f53.docx" , Type = ".docx" , UploadDate = DateTime.Parse("2021/10/23 下午 07:45:18") } ,
+                    new VMDwonloadFiles() { idx=3, OriginalName = "如何將粉絲群一分為二 (重寫最後生還者2).docx" , StoredUpName = "6e6cbe76-11e0-4c30-9f5e-46342721ad99.docx" , Type = ".docx" , UploadDate = DateTime.Parse("2021/10/23 下午 07:50:56") }
+            };
+
+            int id = Int32.Parse(iFormcollection["item.idx"]);
+            VMDwonloadFiles dwonloadFiles = fileList.Where(f => f.idx == id).FirstOrDefault();
+            string UploadPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Upload", dwonloadFiles.StoredUpName));
+            string DownloadPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Download", dwonloadFiles.OriginalName));
+
+            System.IO.File.Copy(UploadPath, DownloadPath, true);
+
+            //return View(fileList);
+            string FileUrl = "/app-download/" + dwonloadFiles.OriginalName;
+            return Redirect(FileUrl);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

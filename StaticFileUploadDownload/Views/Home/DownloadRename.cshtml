@@ -1,4 +1,4 @@
-﻿@model IEnumerable<StaticFileUploadDownload.Models.VMFiles>
+﻿@model IEnumerable<StaticFileUploadDownload.Models.VMDwonloadFiles>
 
 @{
     ViewData["Title"] = "重新命名下載";
@@ -21,10 +21,13 @@
         {
             <tr>
                 <td>
-                    <a class="btn btn-success" href="@item.Path">下載</a>
+                    <form asp-action="DownloadRename">
+                        <input type="hidden" asp-for="@item.idx" />
+                        <input type="submit"  value="下載" class="btn btn-success" />
+                    </form>
                 </td>
                 <td class="align-middle">
-                    @Html.DisplayFor(modelItem => item.Name)
+                    @Html.DisplayFor(modelItem => item.OriginalName)
                 </td>
                 <td class="align-middle">
                     @Html.DisplayFor(modelItem => item.Type)
