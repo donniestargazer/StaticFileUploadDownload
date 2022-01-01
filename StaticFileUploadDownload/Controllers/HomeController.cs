@@ -373,6 +373,7 @@ namespace StaticFileUploadDownload.Controllers
 
         public IActionResult DownloadRename()
         {
+            //考量到重新命名並下載檔案只需要知道上傳的檔案名稱，不需要知道整個路徑，而建立新的 Model
             List<VMDwonloadFiles> fileList =
                 new List<VMDwonloadFiles>() {
                     new VMDwonloadFiles() { idx=1, OriginalName = "ACEU 最佳移動教學.docx" , StoredUpName = "115d43f2-18b9-4828-958a-f997857fa8e9.docx" , Type = ".docx" , UploadDate = DateTime.Parse("2021/10/23 下午 07:28:45") } ,
@@ -384,7 +385,7 @@ namespace StaticFileUploadDownload.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DownloadRename(IFormCollection iFormcollection)
+        public IActionResult DownloadRename(IFormCollection iFormcollection)
         {
             List<VMDwonloadFiles> fileList =
                 new List<VMDwonloadFiles>() {
@@ -395,12 +396,15 @@ namespace StaticFileUploadDownload.Controllers
 
             int id = Int32.Parse(iFormcollection["item.idx"]);
             VMDwonloadFiles dwonloadFiles = fileList.Where(f => f.idx == id).FirstOrDefault();
+
+            //取得上傳的檔案的路徑與要下載的檔案的路徑，這時候要下載的檔案還沒有存在下載的資料夾
             string UploadPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Upload", dwonloadFiles.StoredUpName));
             string DownloadPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Download", dwonloadFiles.OriginalName));
 
+            //將檔案複製到下載的資料夾並將其覆寫
             System.IO.File.Copy(UploadPath, DownloadPath, true);
 
-            //return View(fileList);
+            //結合於 setup 寫的路徑成下載的網址 
             string FileUrl = "/app-download/" + dwonloadFiles.OriginalName;
             return Redirect(FileUrl);
         }
